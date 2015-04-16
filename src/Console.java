@@ -7,6 +7,8 @@ public class Console
 	public static void main(String args[])
 	{
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		
+
  
 
 		while (true)
@@ -25,7 +27,7 @@ public class Console
 		}
 	}
 
-	private static void command(String input)
+	private static void command(String input) throws Exception
 	{
 		Parser p = new Parser(input);
 		p.printInfixExp();
@@ -33,9 +35,5 @@ public class Console
 		System.out.println("<< command 함수에서 " + input + " 명령을 처리할 예정입니다 >>");
 	}
 
-	public static boolean isNumber(char c){
-		if(Character.getNumericValue(c)<10 &&Character.getNumericValue(c)>-1)
-			return true;
-		return false;
-	}
+	
 }
