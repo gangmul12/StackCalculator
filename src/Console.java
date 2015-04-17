@@ -31,6 +31,9 @@ public class Console
 	{
 		Parser p = new Parser(input);
 		p.printInfixExp();
+		p.changeNotation();
+		System.out.println("");
+		p.printPostfixExp();
 		// TODO : 아래 문장을 삭제하고 구현해라.
 		System.out.println("<< command 함수에서 " + input + " 명령을 처리할 예정입니다 >>");
 	}

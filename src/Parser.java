@@ -3,17 +3,18 @@ import java.util.Stack;
 import java.util.ArrayList;
 public class Parser {
 	ArrayList<String> infixExp;
-	Stack<String> operandStack;
+	Stack<String> operatorStack;
 	ArrayList<String> postfixExp;
 
 	public Parser(String input) throws Exception{
 		infixExp = new ArrayList<String>();
 		
 		setInfix(input);
-		operandStack = new Stack<String>();
+		operatorStack = new Stack<String>();
 		checkEquation();
 		
 		postfixExp = new ArrayList<String>();
+		
 	}
 
 	public void setInfix(String input){
@@ -42,18 +43,18 @@ public class Parser {
 		
 		//dealing with brace pair matching error
 		ListIterator<String> it = infixExp.listIterator();
-		char temp;
+		char cur;
 		while(it.hasNext()){
-			temp = it.next().charAt(0);
-			if(temp=='(')
-				operandStack.push("(");
-			if(temp==')'){
-				if(operandStack.isEmpty())
+			cur = it.next().charAt(0);
+			if(cur=='(')
+				operatorStack.push("(");
+			if(cur==')'){
+				if(operatorStack.isEmpty())
 					throw new Exception();
-				operandStack.pop();
+				operatorStack.pop();
 			}
 		}
-		if(!operandStack.isEmpty())
+		if(!operatorStack.isEmpty())
 			throw new Exception();
 		
 		
@@ -63,29 +64,29 @@ public class Parser {
 		char prev='!';
 		int i=0;
 		while(it.hasNext()){
-			temp = it.next().charAt(0);
+			cur = it.next().charAt(0);
 			
 			//dealing with 'index=0 case'
-			if(i==0&&(temp=='+'||temp==')'||temp=='^'||temp=='/'||temp=='%'||temp=='*')){
+			if(i==0&&(cur=='+'||cur==')'||cur=='^'||cur=='/'||cur=='%'||cur=='*')){
 				throw new Exception();
 			}
 			else if(i==0){
 				i++;
-				prev=temp;
+				prev=cur;
 				continue;
 			}
 				
 			
 			//dealing with 'number case'
-			else if(isNumber(temp)){
+			else if(isNumber(cur)){
 				if(isNumber(prev)||prev==')')
 					throw new Exception();
-				prev = temp;
+				prev = cur;
 				continue;
 			}
 			//dealing with 'operand case'
 			else {
-				switch(temp){
+				switch(cur){
 			
 				case '-':
 					break;
@@ -110,12 +111,12 @@ public class Parser {
 					throw new Exception();
 				}
 				
-				prev = temp;
+				prev = cur;
 			}
 			
 		}
-		temp = infixExp.get(infixExp.size()-1).charAt(0);
-		if(!(isNumber(temp)||temp==')'))
+		cur = infixExp.get(infixExp.size()-1).charAt(0);
+		if(!(isNumber(cur)||cur==')'))
 			throw new Exception();
 			
 	}
@@ -123,12 +124,12 @@ public class Parser {
 	private boolean charCheck(){
 		
 		ListIterator<String> it = infixExp.listIterator();
-		String temp;
+		String cur;
 		while(it.hasNext()){
-			temp = it.next();
-			if(isNumber(temp.charAt(0)))
+			cur = it.next();
+			if(isNumber(cur.charAt(0)))
 					continue;
-			switch(temp.charAt(0)){
+			switch(cur.charAt(0)){
 			case '+':
 			case '-':
 			case '^':
@@ -155,8 +156,76 @@ public class Parser {
 		while(it.hasNext())
 			System.out.print(it.next()+" ~ ");
 	}
-	public void changeNotation(){
 	
+	public void printPostfixExp(){
+		ListIterator<String> it = postfixExp.listIterator();
+		while(it.hasNext())
+			System.out.print(it.next()+" ");
+	}
+	
+	public void changeNotation(){
+		ListIterator<String> it = infixExp.listIterator();
+		String cur;
+		String prev = infixExp.get(0);
+		int i=0;
+		while(it.hasNext()){
+			cur = it.next();
+			if(isNumber(cur.charAt(0)))
+					postfixExp.add(cur);
+			else{
+				switch(cur.charAt(0)){
+				case '(':
+					operatorStack.push("(");
+					break;
+				case ')':
+					while(operatorStack.peek()!="(")
+						postfixExp.add(operatorStack.pop());
+					operatorStack.pop();
+					break;
+					
+					
+				
+				case '^':
+				case'-':
+					char minusCheck = cur.charAt(0);
+					String temp = cur;
+					if(i==0||isOperator(prev.charAt(0))){
+						minusCheck = '~';
+						temp = "~";
+					}
+						
+					while((!operatorStack.isEmpty())&&operatorStack.peek()!="("&&precedence(minusCheck)>precedence(operatorStack.peek().charAt(0))){
+						postfixExp.add(operatorStack.pop());
+						
+					}
+					operatorStack.push(temp);
+					break;
+					
+			
+					
+					
+										
+				default:
+				
+					
+					while((!operatorStack.isEmpty())&&operatorStack.peek()!="("&&precedence(cur.charAt(0))>=precedence(operatorStack.peek().charAt(0))){
+						postfixExp.add(operatorStack.pop());
+						
+					}
+					operatorStack.push(cur);
+					break;
+				
+				}
+			}
+			prev = cur;
+			i++;
+		}
+		
+		while(!operatorStack.isEmpty()){
+			postfixExp.add(operatorStack.pop());
+		}
+	
+		
 
 	}
 
@@ -165,11 +234,36 @@ public class Parser {
 		return postfixExp;
 	
 	}
-	
 	public static boolean isNumber(char c){
 		if(Character.getNumericValue(c)<10 &&Character.getNumericValue(c)>-1)
 			return true;
 		return false;
+	}
+	public static boolean isOperator(char c){
+		if(isNumber(c)||c=='('||c==')')
+			return false;
+		else
+			return true;
+	}
+	private int precedence(char ch){
+		switch(ch){
+		case'(':
+		case')':
+			return 0;
+		case'^':
+			return 1;
+		case'~':
+			return 2;
+		case'*':
+		case'%':
+		case'/':
+			return 3;
+		default:
+			return 4;
+			
+			
+		
+		}
 	}
 
 }
