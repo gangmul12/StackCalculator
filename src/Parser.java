@@ -4,7 +4,7 @@ import java.util.ArrayList;
 public class Parser {
 	ArrayList<String> infixExp;
 	Stack<String> operatorStack;
-	ArrayList<String> postfixExp;
+	Stack<String> postfixExp;
 
 	public Parser(String input) throws Exception{
 		infixExp = new ArrayList<String>();
@@ -13,7 +13,7 @@ public class Parser {
 		operatorStack = new Stack<String>();
 		checkEquation();
 		
-		postfixExp = new ArrayList<String>();
+		postfixExp = new Stack<String>();
 		
 	}
 
@@ -171,7 +171,7 @@ public class Parser {
 		while(it.hasNext()){
 			cur = it.next();
 			if(isNumber(cur.charAt(0)))
-					postfixExp.add(cur);
+					postfixExp.push(cur);
 			else{
 				switch(cur.charAt(0)){
 				case '(':
@@ -179,7 +179,7 @@ public class Parser {
 					break;
 				case ')':
 					while(operatorStack.peek()!="(")
-						postfixExp.add(operatorStack.pop());
+						postfixExp.push(operatorStack.pop());
 					operatorStack.pop();
 					break;
 					
@@ -195,7 +195,7 @@ public class Parser {
 					}
 						
 					while((!operatorStack.isEmpty())&&operatorStack.peek()!="("&&precedence(minusCheck)>precedence(operatorStack.peek().charAt(0))){
-						postfixExp.add(operatorStack.pop());
+						postfixExp.push(operatorStack.pop());
 						
 					}
 					operatorStack.push(temp);
@@ -209,7 +209,7 @@ public class Parser {
 				
 					
 					while((!operatorStack.isEmpty())&&operatorStack.peek()!="("&&precedence(cur.charAt(0))>=precedence(operatorStack.peek().charAt(0))){
-						postfixExp.add(operatorStack.pop());
+						postfixExp.push(operatorStack.pop());
 						
 					}
 					operatorStack.push(cur);
@@ -222,14 +222,14 @@ public class Parser {
 		}
 		
 		while(!operatorStack.isEmpty()){
-			postfixExp.add(operatorStack.pop());
+			postfixExp.push(operatorStack.pop());
 		}
 	
 		
 
 	}
 
-	public ArrayList<String> getPostFixExp(){
+	public Stack<String> getPostFixExp(){
 
 		return postfixExp;
 	
