@@ -8,9 +8,11 @@ public class Parser {
 
 	public Parser(String input) throws Exception{
 		infixExp = new ArrayList<String>();
+		
 		setInfix(input);
-		checkEquation();
 		operandStack = new Stack<String>();
+		checkEquation();
+		
 		postfixExp = new ArrayList<String>();
 	}
 
@@ -34,10 +36,30 @@ public class Parser {
 	}
 	
 	private void checkEquation() throws Exception{
+		//dealing with wrong character
 		if(!charCheck())
 			throw new Exception();
+		
+		//dealing with brace pair matching error
 		ListIterator<String> it = infixExp.listIterator();
 		char temp;
+		while(it.hasNext()){
+			temp = it.next().charAt(0);
+			if(temp=='(')
+				operandStack.push("(");
+			if(temp==')'){
+				if(operandStack.isEmpty())
+					throw new Exception();
+				operandStack.pop();
+			}
+		}
+		if(!operandStack.isEmpty())
+			throw new Exception();
+		
+		
+		//dealing with expression error
+		it = infixExp.listIterator();
+		
 		char prev='!';
 		int i=0;
 		while(it.hasNext()){
@@ -61,13 +83,12 @@ public class Parser {
 				prev = temp;
 				continue;
 			}
-			
+			//dealing with 'operand case'
 			else {
 				switch(temp){
 			
 				case '-':
-					if(prev=='-'||prev=='(')
-						break;
+					break;
 				case '+':
 				case '^':
 				case '/':
@@ -80,8 +101,9 @@ public class Parser {
 				case '(':
 					if(isNumber(prev))
 						throw new Exception();
+					break;
 				case ')':
-					if((!isNumber(prev))||!(prev==')'))
+					if(!(isNumber(prev)||prev==')'))
 						throw new Exception();
 					break;
 				default:
@@ -90,7 +112,11 @@ public class Parser {
 				
 				prev = temp;
 			}
+			
 		}
+		temp = infixExp.get(infixExp.size()-1).charAt(0);
+		if(!(isNumber(temp)||temp==')'))
+			throw new Exception();
 			
 	}
 	
