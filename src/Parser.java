@@ -121,6 +121,7 @@ public class Parser {
 			
 	}
 	
+	//if an wrong character is in the input, return false;
 	private boolean charCheck(){
 		
 		ListIterator<String> it = infixExp.listIterator();
@@ -164,58 +165,69 @@ public class Parser {
 		System.out.println("");
 	}
 	
+	//change Notation from infix to postfix
 	public void changeNotation(){
 		ListIterator<String> it = infixExp.listIterator();
 		String cur;
 		String prev = infixExp.get(0);
 		int i=0;
+		
 		while(it.hasNext()){
 			cur = it.next();
+			
+			//if it is number, push to stack
 			if(isNumber(cur.charAt(0)))
 					postfixExp.push(cur);
+			//if it is not a number..
 			else{
 				switch(cur.charAt(0)){
 				case '(':
 					operatorStack.push("(");
 					break;
 				case ')':
+					//push to postfixExp from operatorStack while we meet '('
 					while(operatorStack.peek()!="(")
 						postfixExp.push(operatorStack.pop());
 					operatorStack.pop();
 					break;
+					//if it is a operator
+				case '^'://^ is dealt with separately because of it's right associative feature
+						while((!operatorStack.isEmpty())&&operatorStack.peek()!="("&&precedence(cur.charAt(0))>precedence(operatorStack.peek().charAt(0))){
+							postfixExp.push(operatorStack.pop());
+						}
 					
-					
+					operatorStack.push(cur);
+					break;
 				
-				case '^':
-				case'-':
-					char minusCheck = cur.charAt(0);
-					String temp = cur;
-					if(i==0||isOperator(prev.charAt(0))){
+				case'-'://- is dealt with separately because it can be '-' or '~'
+					char minusCheck = '-';
+					String temp = "-";
+					if(i==0||!isEndOfE(prev.charAt(0))){
 						minusCheck = '~';
 						temp = "~";
 					}
-						
-					while((!operatorStack.isEmpty())&&operatorStack.peek()!="("&&precedence(minusCheck)>precedence(operatorStack.peek().charAt(0))){
-						postfixExp.push(operatorStack.pop());
-						
+					//~ is right associative
+					if(minusCheck == '~'){	
+						while((!operatorStack.isEmpty())&&operatorStack.peek()!="("&&precedence(minusCheck)>precedence(operatorStack.peek().charAt(0))){
+							postfixExp.push(operatorStack.pop());
+						}
+					}
+					//- is left associative
+					else{
+						while((!operatorStack.isEmpty())&&operatorStack.peek()!="("&&precedence(minusCheck)>=precedence(operatorStack.peek().charAt(0))){
+							postfixExp.push(operatorStack.pop());
+						}
 					}
 					operatorStack.push(temp);
 					break;
 					
-			
-					
-					
-										
 				default:
-				
-					
 					while((!operatorStack.isEmpty())&&operatorStack.peek()!="("&&precedence(cur.charAt(0))>=precedence(operatorStack.peek().charAt(0))){
 						postfixExp.push(operatorStack.pop());
 						
 					}
 					operatorStack.push(cur);
 					break;
-				
 				}
 			}
 			prev = cur;
@@ -253,12 +265,13 @@ public class Parser {
 			return true;
 		return false;
 	}
-	public static boolean isOperator(char c){
-		if(isNumber(c)||c=='('||c==')')
-			return false;
-		else
+	
+	public static boolean isEndOfE(char c){
+		if(isNumber(c)||c==')')
 			return true;
+		return false;
 	}
+	
 	private int precedence(char ch){
 		switch(ch){
 		case'(':

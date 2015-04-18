@@ -34,6 +34,8 @@ public class Evaluator {
 				
 				switch(temp.charAt(0)){
 				case '^':
+					if(operand1==0&&operand2<0)
+						throw new Exception();
 					calculator.push((long)Math.pow(operand1, operand2));
 					break;
 				case '*':
