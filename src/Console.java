@@ -22,7 +22,7 @@ public class Console
 			}
 			catch (Exception e)
 			{
-				System.out.println("입력이 잘못되었습니다. 오류 : " + e.toString());
+				System.out.println("ERROR");
 			}
 		}
 	}
@@ -33,6 +33,7 @@ public class Console
 		p.changeNotation();
 		Evaluator e = new Evaluator(p.getPostFixExp());
 		e.evaluate();
+		p.printPostfixExp();
 		e.printResult();
 	}
 

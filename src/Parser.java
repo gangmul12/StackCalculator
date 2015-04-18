@@ -161,6 +161,7 @@ public class Parser {
 		ListIterator<String> it = postfixExp.listIterator();
 		while(it.hasNext())
 			System.out.print(it.next()+" ");
+		System.out.println("");
 	}
 	
 	public void changeNotation(){
@@ -230,8 +231,21 @@ public class Parser {
 	}
 
 	public Stack<String> getPostFixExp(){
+		Stack<String> tempStack = new Stack<String>();
+		Stack<String> result = new Stack<String>();
+		String temp;
+		while(!postfixExp.isEmpty())
+			tempStack.add(postfixExp.pop());
+			
+		
+		while(!tempStack.isEmpty()){
+			temp = tempStack.pop();
+			result.push(temp);
+			postfixExp.push(temp);
+		}
+		
 
-		return postfixExp;
+		return result;
 	
 	}
 	public static boolean isNumber(char c){
