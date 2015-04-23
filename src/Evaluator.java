@@ -14,7 +14,7 @@ public class Evaluator {
 	}
 	
 	
-	//TODO implement this
+
 	
 	public void evaluate() throws Exception{
 		String temp;
@@ -43,9 +43,13 @@ public class Evaluator {
 					break;
 				
 				case '/':
+					if(operand2==0)
+						throw new Exception();
 					calculator.push(operand1/operand2);
 					break;
 				case '%':
+					if(operand2==0)
+						throw new Exception();
 					calculator.push(operand1%operand2);
 					break;
 				

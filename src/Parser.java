@@ -160,9 +160,10 @@ public class Parser {
 	
 	public void printPostfixExp(){
 		ListIterator<String> it = postfixExp.listIterator();
+		String output = "";
 		while(it.hasNext())
-			System.out.print(it.next()+" ");
-		System.out.println("");
+			output= output + it.next() + " ";
+		System.out.println(output.substring(0, output.length()-1));
 	}
 	
 	//change Notation from infix to postfix
